@@ -134,12 +134,19 @@ function Construct(options, callback) {
                   },
                   insert: function(callback) {
                     return self._apos.putPage(req, item.slug, item, function(err) {
-                      console.log(err);
                       return callback(err);
                     });
                   }
                 }, callback);
               }, callback);
+            }
+            if (item.update) {
+              // For now updates are always single. We get
+              // a fatal error from mongo if we try to use
+              // multi when $ operators are not present, and
+              // we don't have a need for multi so far in
+              // our patchfiles.
+              return collection.update(item.update.criteria, item.update.command, callback);
             }
             return callback("Unrecognized change type in collection: " + JSON.stringify(item));
           }, callback);
