@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-patch",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Generate and apply \"patches\" to graft portions of one Apostrophe CMS site into another.",
   "main": "index.js",
   "scripts": {
