@@ -44,12 +44,32 @@ function Construct(options, callback) {
           return async.eachSeries(collectionPatch.changes, function(item, callback) {
             if (item.insert) {
               if (name !== 'aposPages') {
-                // Other collections are simple
+                // Other collections are simple, almost
+                var options = item.options || {};
+                if (options.ifNew) {
+                  // Insert only if id is not present.
+                  // Avoids duplicate key errors when merging
+                  // folders of pages that utilize some of
+                  // the same media and build IDs for it in
+                  // the same way
+                  return async.eachSeries(item.insert, function(item, callback) {
+                    return collection.findOne({ _id: item._id }, function(err, exists) {
+                      if (err) {
+                        return callback(err);
+                      }
+                      if (exists) {
+                        return callback(null);
+                      }
+                      return collection.insert(item, callback);
+                    });
+                  }, callback);
+                }
+                // Truly simple
                 return collection.insert(item.insert, callback);
               }
               // pages require some special cases
               return async.eachSeries(item.insert, function(item, callback) {
-
+                console.log(item.path);
                 // putPage will treat it as an old page
                 // if it has an _id, but if we supply
                 // a _newId that will be used and putPage
@@ -147,6 +167,12 @@ function Construct(options, callback) {
               // we don't have a need for multi so far in
               // our patchfiles.
               return collection.update(item.update.criteria, item.update.command, callback);
+            }
+            if (item.remove) {
+              if (!item.remove.criteria) {
+                return callback('No criteria object in remove object: ' + JSON.stringify(item));
+              }
+              return collection.remove(item.remove.criteria, callback);
             }
             return callback("Unrecognized change type in collection: " + JSON.stringify(item));
           }, callback);
