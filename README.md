@@ -1,3 +1,7 @@
+# ⛔️ **DEPRECATED** — do not use for new projects
+
+See [our current docs](https://docs.apostrophecms.org/)
+
 # apostrophe-patch
 
 Utility tasks for importing and, eventually, exporting part or all of the content of an A2 site as files in JSON format.
